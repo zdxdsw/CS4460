@@ -1,0 +1,114 @@
+<html>
+<body>
+ 
+<h1>CS4460 Project1</h1>
+<h2>By CHANG Yingshan (ychang363)</h2>
+
+<svg width="400" height="400">
+    <rect x="175" y="50" width="50" height="250" fill="red"/>
+</svg> 
+<svg width="400" height="400">
+    <rect x="0" y="150" width="50" height="150"
+    style="fill:green; stroke:black; stroke-width:2"></rect>
+    <rect x="50" y="75" width="50" height="225"
+    style="fill:green; stroke:black; stroke-width:2"></rect>
+    <rect x="100" y="75" width="50" height="225"
+    style="fill:green; stroke:black; stroke-width:2"></rect>
+    <rect x="150" width="50" height="300"
+    style="fill:green; stroke:black; stroke-width:2"></rect>
+    <rect x="200" width="50" height="300"
+    style="fill:green; stroke:black; stroke-width:2"></rect>
+    <rect x="250" y="75" width="50" height="225"
+    style="fill:green; stroke:black; stroke-width:2"></rect>
+    <rect x="300" y="75" width="50" height="225"
+    style="fill:green; stroke:black; stroke-width:2"></rect>
+    <rect x="350" y="150" width="50" height="150"
+    style="fill:green; stroke:black; stroke-width:2"></rect>
+
+
+</svg>
+<svg width="400" height="400">
+    <polyline points="25,150 75,75 125,75 175,1 225,1 275,75 325,75 375,150"
+    style="fill:none;stroke:black;stroke-width:2" />
+</svg>
+
+<body onload="document.body.appendChild(
+    pieChart([10,30],400,400,200,200,150,
+    ['green','yellow'])
+)">
+<script>
+    /*create an svg element and draw a pie chart
+    * Parameter: 
+    *   data:a list of numbers representing the size of each piece
+    *   width,height: size of svg element
+    *   cx,cy,r:center and radius of the pie chart
+    *   colors:a list of colors representing the color of each piece
+    * Return：
+    *   An svg element that contains a pie chart
+    *   */
+    function pieChart(data,width,height,cx,cy,r,colors){
+        var svgns="http://www.w3.org/2000/svg";
+
+        //create an svg element and specify size and position
+        var chart=document.createElementNS(svgns,"svg:svg");
+        chart.setAttribute("width",width);
+        chart.setAttribute("height",height);
+        chart.setAttribute("viewBox","0 0 "+width+" "+height);
+
+        //add all number in "data" list together in order to know the total value
+        var total=0;
+        for(var i=0;i<data.length;i++){
+            total+=data[i];
+        }
+
+        //calculate angle of each piece
+        var angles=[];
+        for(var i=0;i<data.length;i++)
+            angles[i]=data[i]/total*Math.PI*2;
+
+
+        //For every piece of the pie chart:
+        starttangle=0;
+        for(var i=0;i<data.length;i++){
+            //end of the piece
+            var endangle=starttangle+angles[i];
+
+            //angle 0 is upward
+            //angle is increasing clockwise
+            var x1=cx+r*Math.sin(starttangle);
+            var y1=cy-r*Math.cos(starttangle);
+            var x2=cx+r*Math.sin(endangle);
+            var y2=cy-r*Math.cos(endangle);
+
+            //this indicates whether the angle has become larger than 180 degree
+            var big=0;
+            if(endangle-starttangle>Math.PI) big=1;
+
+            //use <svg:path> element to describe each piece
+            var path=document.createElementNS(svgns,"path");
+
+            //path information
+            var d="M "+cx+","+cy+ //start from the center
+                " L "+x1+","+y1+   //draw a line toward (x1,y1)
+                " A "+r+","+r+   //draw a curve with radius r
+                " 0 "+big+" 1 "+ 
+                x2+","+y2+    //end at (x2,y2)
+                " Z";   //the path ends at (cx,cy)
+
+            //set attrubutes for the <svg:path> element
+            path.setAttribute("d",d);   //set path
+            path.setAttribute("fill",colors[i]); //set color of the piece
+            path.setAttribute("stroke","black");  //the border of the piece is set to black
+            path.setAttribute("stroke-width","2"); //the width of the border is 2px
+            chart.appendChild(path); //append the piece into the pie chart
+
+            //ending angle of the previous piece is starting anagle of the next
+            starttangle=endangle;
+        }
+        return chart;
+    }
+
+</script>
+</body>
+</body>
+</html>
